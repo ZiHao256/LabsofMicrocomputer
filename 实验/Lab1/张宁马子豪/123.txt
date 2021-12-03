@@ -1,0 +1,161 @@
+_STACK		SEGMENT	STACK	
+		DW	100 DUP(?)	
+_STACK		ENDS		
+			
+DATA		SEGMENT	WORD PUBLIC 'DATA'
+max_len		DB	20
+real_len	DB	?
+buf_str		DB	20	DUP(0)
+buff		DB	20,?,20 DUP(0)
+
+STRING		DB	'Hello World!','$'
+NAME1		DB	'请输入姓名','$'
+XUEHAO		DB	'请输入学号','$'
+ZIMU		DB	'请输入字母','$'
+CHANGELINE 	DB	13,10,'$'
+INPUT		DB	"0"	
+DATA		ENDS		
+			
+CODE		SEGMENT		
+START		PROC	HW	
+		ASSUME	CS:CODE, DS:DATA, SS:_STACK
+		
+ 		;输出换行		
+ 		mov AX,DATA
+		MOV DS,AX
+		MOV DX, OFFSET CHANGELINE
+		mov ah,09H
+		int 21H
+ 		
+		mov AX,DATA
+		MOV DS,AX
+		MOV DX, OFFSET STRING
+		mov ah,09H
+		int 21H
+		;输出换行
+		mov AX,DATA
+		MOV DS,AX
+		MOV DX, OFFSET CHANGELINE
+		mov ah,09H
+		int 21H
+		
+		;输出姓名提示
+ 
+		mov AX,DATA
+		MOV DS,AX
+		MOV DX,OFFSET NAME1
+		mov ah,09H
+		int 21H
+		
+		;shu ru xing ming
+		mov AX,DATA
+		MOV DS,AX
+		MOV DX,OFFSET max_len
+		XOR AL,AL
+		MOV AH,10
+		INT 21H
+		
+		MOV BX,OFFSET buf_str
+		add bl,real_len
+		adc bh,0
+		mov byte ptr[bx],20h
+		
+ 
+		MOV DX, OFFSET CHANGELINE
+		mov ah,09H
+		int 21H
+ 
+ 
+		MOV DX,OFFSET buf_str
+		mov ah,09H
+		int 21H
+		
+		;HUAN HANG
+		MOV DX, OFFSET CHANGELINE
+		mov ah,09H
+		int 21H
+		
+		; shu ru xue hao ti shi
+		
+		mov AX,DATA
+		MOV DS,AX
+		MOV DX,OFFSET XUEHAO
+		mov ah,09H
+		int 21H
+				
+		;输入学号
+		mov AX,DATA
+		MOV DS,AX
+		MOV DX,OFFSET max_len
+		XOR AL,AL
+		MOV AH,10
+		INT 21H
+		
+		MOV BX,OFFSET buf_str
+		add bl,real_len
+		adc bh,0
+		mov byte ptr[bx],20h
+		
+ 
+		MOV DX, OFFSET CHANGELINE
+		mov ah,09H
+		int 21H
+ 
+ 
+		MOV DX,OFFSET buf_str
+		mov ah,09H
+		int 21H
+		
+		MOV DX, OFFSET CHANGELINE
+		mov ah,09H
+		int 21H
+ 
+ 		;输入字母提示
+		mov AX,DATA
+		MOV DS,AX
+		MOV DX,OFFSET ZIMU
+		mov ah,09H
+		int 21H	
+		
+		;输入字母
+S:
+		MOV DX, OFFSET CHANGELINE
+		mov ah,09H
+		int 21H
+		
+ 		mov ah,01h
+ 		int 21H
+ 		mov INPUT ,AL
+ 		
+ 		CMP INPUT, 'Q'
+ 		JMP OVER
+ 		 CMP INPUT, 'q'
+ 		JMP OVER
+ 		
+ 		mov bh,INPUT
+ 		MOV CX,2
+ 		ROL BX,1
+ 		ROL BX,1
+ 		ROL BX,1
+ 		ROL BX,1
+ 		AND BL,0FH
+ 		ADD BL,37H
+ 		
+ 		MOV DL,BL
+ 		MOV AH,02H
+ 		INT 21H
+ 		
+ 		JMP S
+ OVER:
+ 		
+ 		;输出ascll
+ 
+		
+		mov ah,4cH
+		int 21H
+		
+START		ENDP		
+CODE		ENDS		
+END	START
+
+
