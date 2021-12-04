@@ -17,7 +17,7 @@ DATA  ENDS
 CODE  SEGMENT
       ASSUME DS:DATA,SS:MYSTACK,CS:CODE
 START:
-	;输出helloworld
+	;杈撳嚭helloworld
 	MOV AX,DATA
 	MOV DS,AX
 	
@@ -34,7 +34,7 @@ START:
 	MOV AL,00H
 	INT 21H
 	
-	;输出提示
+	;杈撳嚭鎻愮ず
 	MOV AX,DATA
 	MOV DS,AX
 	
@@ -52,7 +52,7 @@ START:
 	MOV AL,00H
 	INT 21H
 	
-	;输入姓名
+	;杈撳叆濮撳悕
 	MOV AX,DATA
 	MOV DS,AX
 	
@@ -61,7 +61,7 @@ START:
 	LEA DX,buffer
 	INT 21H
 	
-	;输出姓名
+	;杈撳嚭濮撳悕
 	MOV AH,09H
 	INT 21H
 
@@ -74,7 +74,7 @@ START:
 	MOV AL,00H
 	INT 21H
 	
-	;输出提示
+	;杈撳嚭鎻愮ず
 	MOV AX,DATA
 	MOV DS,AX
 	
@@ -91,7 +91,7 @@ START:
 	MOV AL,00H
 	INT 21H
 	
-	;输入学号
+	;杈撳叆瀛﹀彿
 	MOV AX,DATA
 	MOV DS,AX
 	
@@ -100,7 +100,7 @@ START:
 	LEA DX,buffer
 	INT 21H
 	
-	;输出学号
+	;杈撳嚭瀛﹀彿
 	MOV AH,09H
 	INT 21H
 	
@@ -115,7 +115,7 @@ START:
 
 again:
 	
-	;输出提示
+	;杈撳嚭鎻愮ず
 	MOV AX,DATA
 	MOV DS,AX
 	
@@ -132,7 +132,7 @@ again:
 	MOV AL,00H
 	INT 21H
 	
-	;输入little
+	;杈撳叆little
 	MOV AX,DATA
 	MOV DS,AX
 	
