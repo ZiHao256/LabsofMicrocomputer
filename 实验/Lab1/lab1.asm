@@ -5,11 +5,11 @@ MYSTACK ENDS
 DATA SEGMENT
 
 CRLF    DB  0DH,0AH,'$'                 ;终止并换行 
-msg     DB  'Hello World!','$'          ;待输出字符串,$结束符
-tip1    DB  'enter your name','$'       ;提示输入姓名
-tip2    DB  'enter your number','$'     ;提示输入学号
-tip3    DB  'this is your name:','$'    ;提示输出姓名
-tip4    DB  'this is your number:','$'  ;提示输出姓名
+msgHel     DB  'Hello World!','$'          ;待输出字符串,$结束符
+tipINam    DB  'Input your name','$'       ;提示输入姓名
+tipINum    DB  'Input your number','$'     ;提示输入学号
+tipONam    DB  'this is your name:','$'    ;提示输出姓名
+tipONum    DB  'this is your number:','$'  ;提示输出姓名
 
 msg2     DB  'hello, please enter a letter(q or Q to quit)','$'
 msg3    DB  ' ASCII is:','$'
@@ -31,7 +31,7 @@ START:
     MOV AX, DATA    ;赋值DATA的段地址给DS寄存器
     MOV DS, AX
 
-    LEA DX, msg     ;输出指定字符串
+    LEA DX, msgHel     ;输出指定字符串
     MOV AH, 09H     
     INT 21H
 
@@ -39,7 +39,7 @@ START:
     MOV AH, 09H
     INT 21H
 
-    LEA DX, tip1    ;输出提示
+    LEA DX, tipINam    ;输出提示
     MOV AH, 09H    
     INT 21H
 
@@ -62,7 +62,7 @@ START:
     MOV AH,09H
     INT 21H
 
-    LEA DX, tip3    ;输出提示
+    LEA DX, tipONam    ;输出提示
     MOV AH, 09H     
     INT 21H
 
@@ -78,7 +78,7 @@ START:
     MOV AH, 09H
     INT 21H
 
-    LEA DX, tip2
+    LEA DX, tipINum
     MOV AH, 09H     ;输出提示
     INT 21H
 
@@ -101,7 +101,7 @@ START:
     MOV AH,09H
     INT 21H
 
-    LEA DX, tip4
+    LEA DX, tipONum
     MOV AH, 09H     ;输出提示
     INT 21H
 
