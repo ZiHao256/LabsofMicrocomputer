@@ -4,14 +4,15 @@ MYSTACK ENDS
 
 DATA SEGMENT
 
-CRLF    DB  0DH,0AH,'$'                 ;终止并换行 
+CRLF       DB  0DH,0AH,'$'                 ;终止并换行 
 msgHel     DB  'Hello World!','$'          ;待输出字符串,$结束符
 tipINam    DB  'Input your name','$'       ;提示输入姓名
 tipINum    DB  'Input your number','$'     ;提示输入学号
 tipONam    DB  'this is your name:','$'    ;提示输出姓名
 tipONum    DB  'this is your number:','$'  ;提示输出姓名
+tipQuit    DB	0DH,0AH,'byebye','$'		  ;quit
 
-msg2     DB  'hello, please enter a letter(q or Q to quit)','$'
+msg2    DB  'hello, please enter a letter(q or Q to quit)','$'
 msg3    DB  ' ASCII is:','$'
 char    DB  ?
 
@@ -49,6 +50,7 @@ START:
 
     LEA DX,buffer1  ;接收name字符串
     MOV AH,0AH
+    MOV AL,00H
     INT 21H
 
     ;对字符串进行处理:在末尾加$表示字符串结束
@@ -88,6 +90,7 @@ START:
 
     LEA DX,buffer2  ;接收number字符串
     MOV AH,0AH
+    MOV AL,00H
     INT 21H
 
     ;处理number字符串,在末尾加$表示字符串结束
@@ -128,6 +131,7 @@ label1:         ;输入字符直到输入字符q或Q
     INT 21H
 
     MOV AH,01H      ;接收一个字符并回显
+    MOV AL,00H
     INT 21H
 
     MOV BL,AL       ;将字符保存在BL中,因为后面的功能可能会影响到AL中的值    
@@ -188,6 +192,10 @@ label4: ;将低四位转换成数字字符
     MOV DL,AL
     MOV AH,02H
     INT 21H
+    
+    MOV DL,'H'
+    MOV AH,02H
+    INT 21H
 
     LEA DX,CRLF     ;换行
     MOV AH,09H
@@ -196,11 +204,15 @@ label4: ;将低四位转换成数字字符
     LOOP label1
 
 label2:     ;输入字符的出口
-
+    LEA DX,tipQuit
+    MOV AH,09H
+    INT 21H
+    
 
     MOV AH,4CH      ;返回DOS系统
     INT 21H
 
 CODE ENDS
 END START
+
 

@@ -1,0 +1,154 @@
+Turbo Assembler	 Version 4.1	    21/12/05 13:31:26	    Page 1
+c:\mzh\lab2\lab2-2.asm
+
+
+
+      1	0000			     MYSTACK SEGMENT STACK
+      2	0000  0A*(00)			 DB  10	DUP(0)
+      3	000A			     MYSTACK ENDS
+      4
+      5	0000			     DATA SEGMENT
+      6	0000  0D 0A 50 6C 65 61	73+	 msgInput    DB	 0DH,0AH,'Please input the string(no more than 255):',0DH,0AH,'$'
+      7	      65 20 69 6E 70 75	74+
+      8	      20 74 68 65 20 73	74+
+      9	      72 69 6E 67 28 6E	6F+
+     10	      20 6D 6F 72 65 20	74+
+     11	      68 61 6E 20 32 35	35+
+     12	      29 3A 0D 0A 24
+     13	002F  0D 0A 54 68 65 20	6E+	 msgOutput   DB	 0DH,0AH,'The number of	digits in the string: ',0DH,0AH,'$'
+     14	      75 6D 62 65 72 20	6F+
+     15	      66 20 64 69 67 69	74+
+     16	      73 20 69 6E 20 74	68+
+     17	      65 20 73 74 72 69	6E+
+     18	      67 3A 20 0D 0A 24
+     19	0058  FF 00 0100*(24)		 buff	     DB	 255, 0, 256 DUP('$') ;	包括一个回车符号 同时保证结尾一定是'$'
+     20	015A			     DATA ENDS
+     21
+     22	0000			     CODE SEGMENT
+     23					 ASSUME	CS:CODE, DS:DATA, ES:DATA, SS:MYSTACK
+     24
+     25	0000			     START:
+     26	0000  B8 0000s			 MOV AX,DATA
+     27	0003  8E D8			 MOV DS,AX
+     28	0005  8E C0			 MOV ES,AX
+     29
+     30	0007  BA 0000r			 LEA DX,msgInput
+     31	000A  B4 09			 MOV AH,09H
+     32	000C  CD 21			 INT 21H
+     33
+     34	000E			     inputString:    ; input string
+     35	000E  BA 0058r			 LEA DX, buff
+     36	0011  B4 0A			 MOV AH,0AH
+     37	0013  B0 00			 MOV AL,00H
+     38	0015  CD 21			 INT 21H
+     39
+     40	0017			     prepare:
+     41	0017  BE 0058r			 LEA SI,buff
+     42	001A  46			 INC SI		     ;buffer[1]
+     43
+     44					 ; CL: store the count of input, used for loop in the future
+     45	001B  8A 0C			 MOV CL,[SI]
+     46	001D  46			 INC SI
+     47
+     48					 ;clear	BX
+     49	001E  33 DB			 XOR BX, BX	 ;store	the number of digits
+     50
+     51	0020			     again:
+     52					 ; Check if end
+     53	0020  80 3C 20			 CMP BYTE PTR [SI], ' '
+     54	0023  74 0E			 JE outResult
+     55
+     56					 ; Check IF NUM
+     57	0025  80 3C 39			 CMP BYTE PTR [SI], '9'
+Turbo Assembler	 Version 4.1	    21/12/05 13:31:26	    Page 2
+c:\mzh\lab2\lab2-2.asm
+
+
+
+     58	0028  77 06			 JA next
+     59	002A			     then:
+     60	002A  80 3C 30			 CMP BYTE PTR [SI], '0'
+     61	002D  72 01			 JB next
+     62
+     63	002F			     isDigit:
+     64	002F  43			 INC BX
+     65
+     66	0030			     next:   ; next char
+     67	0030  46			 INC SI
+     68	0031  E2 ED			 LOOP again
+     69
+     70	0033			     outResult:	 ; OUTPUT "RESULT IS: "
+     71
+     72	0033  50			 PUSH AX
+     73	0034  BA 002Fr			 LEA DX,msgOutput
+     74	0037  B4 09			 MOV AH, 09H
+     75	0039  CD 21			 INT 21H
+     76	003B  58			 POP AX
+     77
+     78					 ; CLEAR RESISTER FOR LATER USE
+     79	003C  33 C9			 XOR CX, CX
+     80
+     81	003E			     L1:
+     82	003E  D1 EB			 SHR BX,1	 ;右移1位，将最低位放入标志寄存器的CF位（最低位）
+     83	0040  9C			 PUSHF		 ;将标志寄存器中的值压栈
+     84	0041  5A			 POP DX		 ;标志寄存器中的值给到DX
+     85	0042  80 E2 01			 AND DL,1	 ;高位清零，保留最低位CF
+     86	0045  80 C2 30			 ADD DL,30H	 ;从数字转换为字符
+     87	0048  52			 PUSH DX	 ;因为从最低位开始读的，所以要利用先读入后输出的机制
+     88	0049  41			 INC CX		 ;CX记录要输出的二进制数位的数量
+     89	004A  83 FB 00			 CMP BX,0	 ;看是否数字全部转换了
+     90	004D  75 EF			 JNE L1
+     91
+     92					 ; 以上实现了到二进制的转换，和到字符的转换，现在我们把它输出
+     93	004F  B4 02			 MOV AH,02H
+     94	0051			     L2:
+     95	0051  5A			 POP DX
+     96	0052  CD 21			 INT 21H
+     97	0054  E2 FB			 LOOP L2 ;这里要用到上面的CX
+     98
+     99	0056  B2 42			 MOV DL,'B'
+    100	0058  B4 02			 MOV AH,02H
+    101	005A  CD 21			 INT 21H
+    102
+    103	005C			     quit:
+    104	005C  B4 4C			 MOV AH,4CH
+    105	005E  CD 21			 INT 21H
+    106	0060			     CODE ENDS
+    107				     END START
+Turbo Assembler	 Version 4.1	    21/12/05 13:31:26	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "21/12/05"
+??FILENAME			  Text	 "lab2-2  "
+??TIME				  Text	 "13:31:26"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODE
+@FILENAME			  Text	 LAB2-2
+@WORDSIZE			  Text	 2
+AGAIN				  Near	 CODE:0020
+BUFF				  Byte	 DATA:0058
+INPUTSTRING			  Near	 CODE:000E
+ISDIGIT				  Near	 CODE:002F
+L1				  Near	 CODE:003E
+L2				  Near	 CODE:0051
+MSGINPUT			  Byte	 DATA:0000
+MSGOUTPUT			  Byte	 DATA:002F
+NEXT				  Near	 CODE:0030
+OUTRESULT			  Near	 CODE:0033
+PREPARE				  Near	 CODE:0017
+QUIT				  Near	 CODE:005C
+START				  Near	 CODE:0000
+THEN				  Near	 CODE:002A
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODE				  16  0060 Para	  none
+DATA				  16  015A Para	  none
+MYSTACK				  16  000A Para	  Stack
+

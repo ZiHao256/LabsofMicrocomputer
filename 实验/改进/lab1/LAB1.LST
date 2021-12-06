@@ -1,0 +1,298 @@
+Turbo Assembler	 Version 4.1	    21/12/05 13:32:20	    Page 1
+c:\mzh\lab1\lab1.asm
+
+
+
+      1	0000			     MYSTACK SEGMENT STACK
+      2	0000  14*(0000)			     DW	20 DUP(0)
+      3	0028			     MYSTACK ENDS
+      4
+      5	0000			     DATA SEGMENT
+      6
+      7	0000  0D 0A 24		     CRLF	DB  0DH,0AH,'$'			;终止并换行
+      8	0003  48 65 6C 6C 6F 20	57+  msgHel	DB  'Hello World!','$'		;待输出字符串,$结束符
+      9	      6F 72 6C 64 21 24
+     10	0010  49 6E 70 75 74 20	79+  tipINam	DB  'Input your	name','$'	;提示输入姓名
+     11	      6F 75 72 20 6E 61	6D+
+     12	      65 24
+     13	0020  49 6E 70 75 74 20	79+  tipINum	DB  'Input your	number','$'	;提示输入学号
+     14	      6F 75 72 20 6E 75	6D+
+     15	      62 65 72 24
+     16	0032  74 68 69 73 20 69	73+  tipONam	DB  'this is your name:','$'	;提示输出姓名
+     17	      20 79 6F 75 72 20	6E+
+     18	      61 6D 65 3A 24
+     19	0045  74 68 69 73 20 69	73+  tipONum	DB  'this is your number:','$'	;提示输出姓名
+     20	      20 79 6F 75 72 20	6E+
+     21	      75 6D 62 65 72 3A	24
+     22	005A  0D 0A 62 79 65 62	79+  tipQuit	DB   0DH,0AH,'byebye','$'	       ;quit
+     23	      65 24
+     24
+     25	0063  68 65 6C 6C 6F 2C	20+  msg2    DB	 'hello, please	enter a	letter(q or Q to quit)','$'
+     26	      70 6C 65 61 73 65	20+
+     27	      65 6E 74 65 72 20	61+
+     28	      20 6C 65 74 74 65	72+
+     29	      28 71 20 6F 72 20	51+
+     30	      20 74 6F 20 71 75	69+
+     31	      74 29 24
+     32	0090  20 41 53 43 49 49	20+  msg3    DB	 ' ASCII is:','$'
+     33	      69 73 3A 24
+     34	009B  ??		     char    DB	 ?
+     35
+     36	009C  14		     buffer1 DB	 20  ;预定义20字节空间
+     37	009D  ??			     DB	 ?   ;输入完成后，自动获取字节数
+     38	009E  14*(??)			     DB	 20  DUP(?)
+     39
+     40	00B2  14		     buffer2 DB	 20
+     41	00B3  ??			     DB	 ?
+     42	00B4  14*(??)			     DB	 20  DUP(?)
+     43
+     44	00C8			     DATA ENDS
+     45
+     46	0000			     CODE SEGMENT
+     47					 ASSUME	CS:CODE, DS:DATA, SS:MYSTACK
+     48	0000			     START:
+     49	0000  B8 0000s			 MOV AX, DATA	 ;赋值DATA的段地址给DS寄存器
+     50	0003  8E D8			 MOV DS, AX
+     51
+     52	0005  BA 0003r			 LEA DX, msgHel	    ;输出指定字符串
+     53	0008  B4 09			 MOV AH, 09H
+     54	000A  CD 21			 INT 21H
+     55
+     56	000C  BA 0000r			 LEA DX, CRLF	 ;换行
+     57	000F  B4 09			 MOV AH, 09H
+Turbo Assembler	 Version 4.1	    21/12/05 13:32:20	    Page 2
+c:\mzh\lab1\lab1.asm
+
+
+
+     58	0011  CD 21			 INT 21H
+     59
+     60	0013  BA 0010r			 LEA DX, tipINam    ;输出提示
+     61	0016  B4 09			 MOV AH, 09H
+     62	0018  CD 21			 INT 21H
+     63
+     64	001A  BA 0000r			 LEA DX, CRLF	 ;换行
+     65	001D  B4 09			 MOV AH, 09H
+     66	001F  CD 21			 INT 21H
+     67
+     68	0021  BA 009Cr			 LEA DX,buffer1	 ;接收name字符串
+     69	0024  B4 0A			 MOV AH,0AH
+     70	0026  B0 00			 MOV AL,00H
+     71	0028  CD 21			 INT 21H
+     72
+     73					 ;对字符串进行处理:在末尾加$表示字符串结束
+     74	002A  A0 009Dr			 MOV AL,buffer1[1]
+     75	002D  04 02			 ADD AL,2
+     76	002F  B4 00			 MOV AH,0
+     77	0031  8B F0			 MOV SI,AX
+     78	0033  C6 84 009Cr 24		 MOV buffer1[SI],'$'
+     79
+     80	0038  BA 0000r			 LEA DX,CRLF	 ;换行
+     81	003B  B4 09			 MOV AH,09H
+     82	003D  CD 21			 INT 21H
+     83
+     84	003F  BA 0032r			 LEA DX, tipONam    ;输出提示
+     85	0042  B4 09			 MOV AH, 09H
+     86	0044  CD 21			 INT 21H
+     87
+     88	0046  BA 0000r			 LEA DX, CRLF	 ;换行
+     89	0049  B4 09			 MOV AH, 09H
+     90	004B  CD 21			 INT 21H
+     91
+     92	004D  BA 009Er			 LEA DX,buffer1[2]  ;输出name字符串
+     93	0050  B4 09			 MOV AH,09H
+     94	0052  CD 21			 INT 21H
+     95
+     96	0054  BA 0000r			 LEA DX, CRLF	 ;换行
+     97	0057  B4 09			 MOV AH, 09H
+     98	0059  CD 21			 INT 21H
+     99
+    100	005B  BA 0020r			 LEA DX, tipINum
+    101	005E  B4 09			 MOV AH, 09H	 ;输出提示
+    102	0060  CD 21			 INT 21H
+    103
+    104	0062  BA 0000r			 LEA DX, CRLF	 ;换行
+    105	0065  B4 09			 MOV AH, 09H
+    106	0067  CD 21			 INT 21H
+    107
+    108	0069  BA 00B2r			 LEA DX,buffer2	 ;接收number字符串
+    109	006C  B4 0A			 MOV AH,0AH
+    110	006E  B0 00			 MOV AL,00H
+    111	0070  CD 21			 INT 21H
+    112
+    113					 ;处理number字符串,在末尾加$表示字符串结束
+    114	0072  A0 00B3r			 MOV AL,buffer2[1]
+Turbo Assembler	 Version 4.1	    21/12/05 13:32:20	    Page 3
+c:\mzh\lab1\lab1.asm
+
+
+
+    115	0075  04 02			 ADD AL,2
+    116	0077  B4 00			 MOV AH,0
+    117	0079  8B F0			 MOV SI,AX
+    118	007B  C6 84 00B2r 24		 MOV buffer2[SI],'$'
+    119
+    120	0080  BA 0000r			 LEA DX,CRLF	 ;换行
+    121	0083  B4 09			 MOV AH,09H
+    122	0085  CD 21			 INT 21H
+    123
+    124	0087  BA 0045r			 LEA DX, tipONum
+    125	008A  B4 09			 MOV AH, 09H	 ;输出提示
+    126	008C  CD 21			 INT 21H
+    127
+    128	008E  BA 0000r			 LEA DX, CRLF	 ;换行
+    129	0091  B4 09			 MOV AH, 09H
+    130	0093  CD 21			 INT 21H
+    131
+    132	0095  BA 00B4r			 LEA DX,buffer2[2]  ;输出number字符串
+    133	0098  B4 09			 MOV AH,09H
+    134	009A  CD 21			 INT 21H
+    135
+    136	009C  BA 0000r			 LEA DX, CRLF	 ;换行
+    137	009F  B4 09			 MOV AH, 09H
+    138	00A1  CD 21			 INT 21H
+    139
+    140	00A3			     label1:	     ;输入字符直到输入字符q或Q
+    141
+    142	00A3  BA 0063r			 LEA DX,msg2	  ;输出提示信息
+    143	00A6  B4 09			 MOV AH,09H
+    144	00A8  CD 21			 INT 21H
+    145
+    146	00AA  BA 0000r			 LEA DX,CRLF	 ;换行
+    147	00AD  B4 09			 MOV AH,09H
+    148	00AF  CD 21			 INT 21H
+    149
+    150	00B1  B4 01			 MOV AH,01H	 ;接收一个字符并回显
+    151	00B3  B0 00			 MOV AL,00H
+    152	00B5  CD 21			 INT 21H
+    153
+    154	00B7  8A D8			 MOV BL,AL	 ;将字符保存在BL中,因为后面的功能可能会影响到AL中的值
+    155
+    156	00B9  80 FB 71			 CMP BL,'q'
+    157	00BC  74 4A			 JZ  label2
+    158
+    159	00BE  80 FB 51			 CMP BL,'Q'
+    160	00C1  74 45			 JZ  label2
+    161
+    162					 ;将字符转换成ASCII
+    163
+    164	00C3  BA 0090r			 LEA DX,msg3
+    165	00C6  B4 09			 MOV AH,09H
+    166	00C8  CD 21			 INT 21H
+    167
+    168	00CA  BA 0000r			 LEA DX,CRLF	 ;换行
+    169	00CD  B4 09			 MOV AH,09H
+    170	00CF  CD 21			 INT 21H
+    171
+Turbo Assembler	 Version 4.1	    21/12/05 13:32:20	    Page 4
+c:\mzh\lab1\lab1.asm
+
+
+
+    172					 ;获取字符高四位
+    173	00D1  8A C3			 MOV AL,BL
+    174	00D3  24 F0			 AND AL,0F0H
+    175	00D5  B1 04			 MOV CL,4
+    176	00D7  D2 E8			 SHR AL,CL
+    177
+    178					 ;和0AH比较
+    179	00D9  3C 0A			 CMP AL,0AH
+    180
+    181	00DB  7C 02			 JL label3
+    182
+    183					 ;大于AH则要加07H
+    184	00DD  04 07			 ADD AL,07H
+    185
+    186	00DF			     label3: ;将高四位转换成数字字符
+    187	00DF  04 30			 ADD AL,30H
+    188
+    189					 ;输出第一个数字字符
+    190	00E1  8A D0			 MOV DL,AL
+    191	00E3  B4 02			 MOV AH,02H
+    192	00E5  CD 21			 INT 21H
+    193
+    194					 ;获取输入字符的低四位
+    195	00E7  8A C3			 MOV AL,BL
+    196	00E9  24 0F			 AND AL,0FH
+    197
+    198	00EB  3C 0A			 CMP AL,0AH
+    199
+    200	00ED  7C 02			 JL label4
+    201
+    202	00EF  04 07			 ADD AL,07H
+    203
+    204	00F1			     label4: ;将低四位转换成数字字符
+    205
+    206	00F1  04 30			 ADD AL,30H
+    207
+    208					 ;输出第二个数字字符
+    209	00F3  8A D0			 MOV DL,AL
+    210	00F5  B4 02			 MOV AH,02H
+    211	00F7  CD 21			 INT 21H
+    212
+    213	00F9  B2 48			 MOV DL,'H'
+    214	00FB  B4 02			 MOV AH,02H
+    215	00FD  CD 21			 INT 21H
+    216
+    217	00FF  BA 0000r			 LEA DX,CRLF	 ;换行
+    218	0102  B4 09			 MOV AH,09H
+    219	0104  CD 21			 INT 21H
+    220
+    221	0106  E2 9B			 LOOP label1
+    222
+    223	0108			     label2:	 ;输入字符的出口
+    224	0108  BA 005Ar			 LEA DX,tipQuit
+    225	010B  B4 09			 MOV AH,09H
+    226	010D  CD 21			 INT 21H
+    227
+    228
+Turbo Assembler	 Version 4.1	    21/12/05 13:32:20	    Page 5
+c:\mzh\lab1\lab1.asm
+
+
+
+    229	010F  B4 4C			 MOV AH,4CH	 ;返回DOS系统
+    230	0111  CD 21			 INT 21H
+    231
+    232	0113			     CODE ENDS
+    233				     END START
+Turbo Assembler	 Version 4.1	    21/12/05 13:32:20	    Page 6
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "21/12/05"
+??FILENAME			  Text	 "lab1	  "
+??TIME				  Text	 "13:32:20"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODE
+@FILENAME			  Text	 LAB1
+@WORDSIZE			  Text	 2
+BUFFER1				  Byte	 DATA:009C
+BUFFER2				  Byte	 DATA:00B2
+CHAR				  Byte	 DATA:009B
+CRLF				  Byte	 DATA:0000
+LABEL1				  Near	 CODE:00A3
+LABEL2				  Near	 CODE:0108
+LABEL3				  Near	 CODE:00DF
+LABEL4				  Near	 CODE:00F1
+MSG2				  Byte	 DATA:0063
+MSG3				  Byte	 DATA:0090
+MSGHEL				  Byte	 DATA:0003
+START				  Near	 CODE:0000
+TIPINAM				  Byte	 DATA:0010
+TIPINUM				  Byte	 DATA:0020
+TIPONAM				  Byte	 DATA:0032
+TIPONUM				  Byte	 DATA:0045
+TIPQUIT				  Byte	 DATA:005A
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODE				  16  0113 Para	  none
+DATA				  16  00C8 Para	  none
+MYSTACK				  16  0028 Para	  Stack
+

@@ -1,0 +1,214 @@
+Turbo Assembler	 Version 4.1	    21/12/05 13:36:17	    Page 1
+c:\mzh\lab2\lab2.asm
+
+
+
+      1	0000			     MYSTACK SEGMENT STACK
+      2	0000  14*(??)			 DB 20 DUP(?)
+      3	0014			     MYSTACK ENDS
+      4
+      5	0000			     DATA SEGMENT
+      6	0000  69 6E 70 75 74 20	74+  magInput	 DB  'input the	numbers(no more	than 5), q or Q	to quit:  ','$'
+      7	      68 65 20 6E 75 6D	62+
+      8	      65 72 73 28 6E 6F	20+
+      9	      6D 6F 72 65 20 74	68+
+     10	      61 6E 20 35 29 2C	20+
+     11	      71 20 6F 72 20 51	20+
+     12	      74 6F 20 71 75 69	74+
+     13	      3A 20 20 24
+     14	0035  0D 0A 69 6E 70 75	74+  msgError	 DB  0DH,0AH,'input error!','$'
+     15	      20 65 72 72 6F 72	21+
+     16	      24
+     17	0044  0D 0A 62 69 6E 61	72+  msgOutput	  DB  0DH,0AH,'binary:','$'
+     18	      79 3A 24
+     19	004E  0D 0A 62 79 65 62	79+  msgQuit	DB  0DH,0AH,'byebye','$'
+     20	      65 24
+     21	0057  63 6F 75 6E 74 66	65+  msgcount	 DB  'countferring...','$'
+     22	      72 72 69 6E 67 2E	2E+
+     23	      2E 24
+     24
+     25	0067  0D 0A 24		     CRLF    DB	 0DH,0AH,'$'
+     26
+     27
+     28	006A			     DATA ENDS
+     29
+     30	0000			     CODE SEGMENT
+     31					 ASSUME	CS:CODE, DS:DATA, SS:MYSTACK
+     32	0000			     START:
+     33
+     34	0000  B8 0000s			 MOV AX,DATA
+     35	0003  8E D8			 MOV DS,AX
+     36
+     37	0005			     again:
+     38	0005  BA 0000r			 LEA DX,magInput     ;输出提示信息1
+     39	0008  B4 09			 MOV AH,09H
+     40	000A  CD 21			 INT 21H
+     41
+     42	000C  B1 05			 MOV CL,5	     ;最多输入5位
+     43	000E  B8 0000			 MOV AX,0
+     44	0011  BA 0000			 MOV DX,0
+     45					 ;MOV SI,0
+     46	0014  BF 0000			 MOV DI,0
+     47
+     48	0017			     inputNum:		 ;输入不超过五位的十进制数
+     49	0017  B4 01			 MOV AH,01H	 ;输入一个字符
+     50	0019  B0 00			 MOV AL,00H
+     51	001B  CD 21			 INT 21H
+     52
+     53
+     54	001D  3C 20			 CMP AL,' '	 ;是否结束输入
+     55	001F  74 2B			 JZ  translate
+     56
+     57	0021  3C 71			 CMP AL,'q'	 ;是否退出程序
+Turbo Assembler	 Version 4.1	    21/12/05 13:36:17	    Page 2
+c:\mzh\lab2\lab2.asm
+
+
+
+     58	0023  74 49			 JZ  quit
+     59
+     60	0025  3C 51			 CMP AL,'Q'
+     61	0027  74 45			 JZ  quit
+     62
+     63	0029  3C 30			 CMP AL,'0'	  ;输入是否合法
+     64	002B  7C 07			 JL  error
+     65
+     66	002D  3C 39			 CMP AL,'9'	     ;输入是否合法
+     67	002F  7F 03			 JG  error
+     68
+     69	0031  EB 04 90			 JMP count
+     70
+     71	0034			     error:
+     72	0034  E8 0066			 CALL pError
+     73
+     74	0037			     count:		     ;按照流程图做乘10加次位操作
+     75	0037  2C 30			 SUB AL,'0'
+     76	0039  B7 00			 MOV BH,0
+     77	003B  8A D8			 MOV BL,AL
+     78	003D  8B C7			 MOV AX,DI
+     79	003F  53			 PUSH BX
+     80	0040  BB 000A			 MOV BX,10
+     81	0043  F7 E3			 MUL BX		     ;BX和AX乘积：存储在DX:AX
+     82	0045  5B			 POP BX
+     83	0046  03 C3			 ADD AX,BX
+     84					 ;ADC DX,0
+     85					 ;MOV SI,DX
+     86	0048  8B F8			 MOV DI,AX	     ;将计算结果存入DI
+     87
+     88	004A  E2 CB			 LOOP	 inputNum
+     89
+     90	004C			     translate:		     ;转换二进制形式
+     91	004C  BA 0044r			 LEA DX,msgOutput    ;输出提示信息
+     92	004F  B4 09			 MOV AH,09H
+     93	0051  CD 21			 INT 21H
+     94
+     95	0053  BA 0067r			 LEA DX,CRLF	     ;换行
+     96	0056  B4 09			 MOV AH,09H
+     97	0058  CD 21			 INT 21H
+     98
+     99					 ;MOV BX,SI	      ;调用10进制转换成2进制的函数转为换高16位
+    100					 ;CALL I2B
+    101	005A  8B DF			 MOV BX,DI	     ;转换为低16位二进制
+    102	005C  E8 0021			 CALL I2B
+    103
+    104	005F  B2 42			 MOV DL,'B'	     ;二进制数字最后添加B
+    105	0061  B4 02			 MOV AH,02H
+    106	0063  CD 21			 INT 21H
+    107
+    108	0065  BA 0067r			 LEA DX,CRLF	     ;换行
+    109	0068  B4 09			 MOV AH,09H
+    110	006A  CD 21			 INT 21H
+    111
+    112	006C  EB 97			 JMP again
+    113
+    114	006E			     quit:		    ;退出程序
+Turbo Assembler	 Version 4.1	    21/12/05 13:36:17	    Page 3
+c:\mzh\lab2\lab2.asm
+
+
+
+    115
+    116	006E  BA 004Er			 LEA DX,msgQuit	    ;输出提示信息4
+    117	0071  B4 09			 MOV AH,09H
+    118	0073  CD 21			 INT 21H
+    119
+    120	0075  BA 0067r			 LEA DX,CRLF	     ;换行
+    121	0078  B4 09			 MOV AH,09H
+    122	007A  CD 21			 INT 21H
+    123
+    124	007C  B4 4C			 MOV AH,4CH	     ;返回DOS操作系统
+    125	007E  CD 21			 INT 21H
+    126
+    127	0080			     I2B:
+    128	0080  B9 0010			 MOV CX,16
+    129	0083			     RS:		     ;对于BX中处理好的数据的每一位,将其转换为字符并从低位开始压栈
+    130	0083  8B C3			 MOV AX,BX
+    131	0085  25 0001			 AND AX,01H
+    132	0088  8A D0			 MOV DL,AL
+    133	008A  80 C2 30			 ADD DL,'0'	     ;将01转换为字符输出
+    134	008D  52			 PUSH DX	     ;因为输出顺序是高位二进制先输出，所以压栈
+    135	008E  D1 EB			 SHR BX,1	     ;对于ASCII的每一位
+    136	0090  E2 F1			 LOOP RS
+    137
+    138	0092  B9 0010			 MOV CX,16
+    139	0095			     outputBnum:	     ;将栈中的数据从高位开始pop
+    140	0095  5A			 POP DX
+    141	0096  B4 02			 MOV AH,02H	     ;输出到屏幕
+    142	0098  CD 21			 INT 21H
+    143	009A  E2 F9			 LOOP outputBnum
+    144	009C  C3			 RET
+    145
+    146
+    147	009D			     pError:
+    148	009D  BA 0035r			 LEA DX,msgError ;输出提示信息
+    149	00A0  B4 09			 MOV AH,09H
+    150	00A2  CD 21			 INT 21H
+    151
+    152	00A4  BA 0067r			 LEA DX,CRLF	 ;换行
+    153	00A7  B4 09			 MOV AH,09H
+    154	00A9  CD 21			 INT 21H
+    155
+    156	00AB  C3			 RET
+    157
+    158	00AC			     CODE ENDS
+    159				     END START
+Turbo Assembler	 Version 4.1	    21/12/05 13:36:17	    Page 4
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "21/12/05"
+??FILENAME			  Text	 "lab2	  "
+??TIME				  Text	 "13:36:17"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODE
+@FILENAME			  Text	 LAB2
+@WORDSIZE			  Text	 2
+AGAIN				  Near	 CODE:0005
+COUNT				  Near	 CODE:0037
+CRLF				  Byte	 DATA:0067
+ERROR				  Near	 CODE:0034
+I2B				  Near	 CODE:0080
+INPUTNUM			  Near	 CODE:0017
+MAGINPUT			  Byte	 DATA:0000
+MSGCOUNT			  Byte	 DATA:0057
+MSGERROR			  Byte	 DATA:0035
+MSGOUTPUT			  Byte	 DATA:0044
+MSGQUIT				  Byte	 DATA:004E
+OUTPUTBNUM			  Near	 CODE:0095
+PERROR				  Near	 CODE:009D
+QUIT				  Near	 CODE:006E
+RS				  Near	 CODE:0083
+START				  Near	 CODE:0000
+TRANSLATE			  Near	 CODE:004C
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODE				  16  00AC Para	  none
+DATA				  16  006A Para	  none
+MYSTACK				  16  0014 Para	  Stack
+
